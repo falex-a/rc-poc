@@ -1,0 +1,23 @@
+{
+  "name" : "rc-poc",
+  "version" : "0.0.1",
+  "main" : "./hello.js",
+  "author" : {
+    "name" : "AlexF",
+    "email" : "alexf@medaware.com"
+  },
+  "dependencies" : {
+    "express" : "3.x"
+  },
+  "keywords" : [ ],
+  "licenses" : {
+    "type" : "none"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "git://github.com/YOUR_LOGIN/hello.git"
+  },
+  "bugs" : {
+    "url" : "http://github.com/YOUR_LOGIN/hello/issues"
+  }
+}
