@@ -1,3 +1,5 @@
+// from: http://jeromeetienne.github.io/virtualjoystick.js/virtualjoystick.js";
+// 
 var VirtualJoystick	= function(opts)
 {
 	opts			= opts			|| {};
