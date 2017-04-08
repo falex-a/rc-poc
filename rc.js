@@ -48,10 +48,16 @@ var commVX=0;
 var commVY=0;
 
 var hosts = [];
-var host_cmds = {};
+//var host_cmds = {};
 
-// Add REST interface to get coordinates by AJAX from virtualjoystick.js..
-//   ...and act as a broker, relaying x,y (..received as URL parameters..) to the IoT device via UDP
+/*
+ *  REST interface to get Vx,Vy commands by AJAX from a controller (e.g. smartphone),
+ *     running joy.html+virtualjoystick.js (which he gets statically served)
+ *     
+ *  save the command if the controller is the active one; 
+ *   also return its status so he can visually present it to the user..   
+ */
+
 app.get('/xy', function(req, res) {
 
     host = req.connection.remoteAddress.toString();
@@ -60,21 +66,30 @@ app.get('/xy', function(req, res) {
         console.log('New controller, IP='+host);
         console.log('curr controllers IPs list: '+hosts);
     }    
-    host_cmds[host] = [req.query.x, req.query.y]; 
+    // host_cmds[host] = [req.query.x, req.query.y]; 
     if( !(req.query.x==='0' && req.query.y==='0') ) {        
         console.log('command from '+host+': x,y = '+req.query.x+','+req.query.y);  
     }
-    commVX = req.query.x;
-    commVY = req.query.y;
-    res.send('OK');
+        
+    if (hosts[ctrlInd]===host) {
+        res.send('enabled');
+        commVX = req.query.x;
+        commVY = req.query.y;
+    } else {
+        res.send('disabled');
+    }    
     //console.log(host_cmds);
-   // res.send('{"id": 1,"name":"Matt","band":"BBQ Brawlers"}');
 });
 
+/**
+ *  Start listening to controllers..
+ */
 app.listen(3001);
 console.log('Listening on port 3001, try <ip>:3001/html/joy.html');
 
-// OK, now let's  try to listen to the nodeMCU identify itself...
+/* 
+ *  Listen to IoT device to identify itself...
+ */
 udpsock = dgram.createSocket('udp4');
 udpsock.on('message', function (msg, info){
     console.log("got UDP msg: "+msg.toString());
@@ -84,26 +99,36 @@ udpsock.on('message', function (msg, info){
 udpsock.bind(6666);
 console.log('Listening for self-discovery UDP on port 6666...');
 
+
+/* 
+ *  Periodically send command update by UDP to IoT device,
+ *   and also check for timeout for controller switch..
+ */
 var i=0;
 var ctrlInd = 0;
+var update_dt_ms = 50 ;
+var switch_dt_ms = 8 * 1000;
 
-// Each 50ms send UDP update to IoT device
 setInterval(function(){
     // console.log('test');
     if( ! hosts.length ) {
         return;
     }
-    if(i++ > 200) { // switch controller :)
+    if(++i > switch_dt_ms/update_dt_ms) { // switch controller :)
         ctrlInd = (ctrlInd+1) % hosts.length;
         if(hosts.length>1) {
             console.log("Switched active controller to "+hosts[ctrlInd]);
+            // initialize to no-motion till the newly-in-power controller starts sending meaningful commands
+            commVX = 0; 
+            commVY = 0;            
         }
         i=0;
     }
     //console.log('tick tock');    
-    var actCtrlVxy = host_cmds[hosts[ctrlInd]];
-    // var message = new Buffer(commVX+','+commVY);
-    var message = new Buffer(actCtrlVxy[0]+','+actCtrlVxy[1]);
+    // var actCtrlVxy = host_cmds[hosts[ctrlInd]];
+    // !! hack - reversing sign because of the implementation inside the IoT..
+    var message = new Buffer(-commVX+','+commVY); 
+    // var message = new Buffer(actCtrlVxy[0]+','+actCtrlVxy[1]);
     // console.log(actCtrlVxy[0]+','+actCtrlVxy[1]);
     if( DEVICE_IP!=='NA' ) { // && !(commVX===0 && commVY===0) ) {        
         client.send(message, 0, message.length, DEVICE_PORT, DEVICE_IP, function(err, bytes) {
@@ -112,4 +137,4 @@ setInterval(function(){
             // client.close();
         });
     }
-}, 50);
+}, update_dt_ms);
