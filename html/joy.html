@@ -33,20 +33,26 @@
 			-webkit-user-select	: none;
 			-moz-user-select	: none;
 		}
+                #footer{
+                    position:fixed;
+                    bottom:0;
+                    left:0;
+                }
 		</style>
 	</head>
 	<body>
 		<div id="container"></div>
 		<div id="info">
-                    <h2>Use your finger as a control stick!</h2>
-			
-                    credits: <a href="http://learningthreejs.com/blog/2011/12/26/let-s-make-a-3d-game-virtual-joystick/" target="_blank">VirtualJoystick.js</a>
-		     , <a href="http://sebleedelisle.com/2011/04/multi-touch-game-controller-in-javascripthtml5-for-ipad/">post</a>
-		       by <a href="http://sebleedelisle.com/">seb.ly</a>
-		
-                    <span id="result"></span>
-                    
+                    <h2 id="head">Use your finger as a control stick!</h2>
+                    <span id="result"></span>                   
 		</div> 
+                <div id="footer"> 
+                    <small>
+                        credits: <a href="http://learningthreejs.com/blog/2011/12/26/let-s-make-a-3d-game-virtual-joystick/" target="_blank">VirtualJoystick.js</a>
+                         , <a href="http://sebleedelisle.com/2011/04/multi-touch-game-controller-in-javascripthtml5-for-ipad/">post</a>
+                           by <a href="http://sebleedelisle.com/">seb.ly</a>
+                    </small>
+                </div>
 		<script src="virtualjoystick.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/1.6.0/math.js"></script>
 		<script>
@@ -67,7 +73,7 @@
                         
 			setInterval(function(){
 				var outputEl	= document.getElementById('result');
-
+                                var headEl	= document.getElementById('head');
                                 var request = new XMLHttpRequest();
                                 //xhr.open("GET", "http://localhost:3001/xy?x="+joystick.deltaX()+"&y="+joystick.deltaX(), false);
                                 request.open("GET", "xy?x="+joystick.deltaX()+"&y="+joystick.deltaY(), false);
@@ -79,7 +85,8 @@
                                 
                                 if(request.responseText === 'enabled') {
                                       document.body.style.background = '#BBB';
-                                      outputEl.innerHTML	= '</br></br><b>ENABLED! current command:</b> '
+                                      headEl.innerHTML = "Use your finger as a control stick!"
+                                      outputEl.innerHTML	= '</br><b> current command:</b> '
                                           + ' vx:'+math.round(joystick.deltaX())
                                           + ' vy:'+math.round(joystick.deltaY())
                                           + (joystick.right()	? ' right'	: '')
@@ -87,8 +94,9 @@
                                           + (joystick.left()	? ' left'	: '')
                                           + (joystick.down()	? ' down' 	: '');	
                                   } else if (request.responseText === 'disabled') {
-                                      document.body.style.background = '#66F';
-                                      outputEl.innerHTML	= '</br></br><b>DISABLED!</b> '
+                                      document.body.style.background = '#444';
+                                      headEl.innerHTML = "DISABLED!! WAIT FOR YOUR TURN!"
+                                      outputEl.innerHTML	= ''; //</br></br><h1>DISABLED!! WAIT FOR YOUR TURN!</h1> '
                                   }
                                 
 			}, 200);
