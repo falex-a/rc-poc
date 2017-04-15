@@ -13,5 +13,5 @@ Playing around with smartphones-controlled toy car
 * * Screen is switched according to the state (e.g. enabled/disabled..)
 * **Hardware & Firmware** - Lua on NodeMCU, see (https://github.com/falex-a/nodemcu-udp2pwm).
 * **Multiplayer game functionality** - 
-* * Game 1 (working) : _*"Real-time Shootout"*_: control is switched between active smartphones every few seconds, so players take turns; Each player got to  move robot through opponent's 'goalpost'.
+* * Game 1 (**WORKING**) : _*"Real-time Shootout"*_: control is switched between active smartphones every few seconds, so players take turns; Each player got to  move robot through opponent's 'goalpost'.
 * * Game 2 (planned) : _*"Bowling"*_- taking actual turns, each player takes control then releases it and car continues for a few seconds with the last command; it has to take down stakeposts but without getting to the wall behind..
